@@ -7,3 +7,7 @@ type URLInfo struct {
 	RedirectCount int
 	CreatedAt     time.Time
 }
+
+type ShortenResp struct {
+	ShortenedURL string `json:"shortened_url"`
+}

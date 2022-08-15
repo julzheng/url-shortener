@@ -11,7 +11,7 @@ import (
 	"url-shortener/internal/utils"
 )
 
-func main() {
+func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.LoadHTMLGlob("internal/templates/*")
 
@@ -49,5 +49,10 @@ func main() {
 		}
 	})
 
+	return router
+}
+
+func main() {
+	router := SetupRouter()
 	router.Run(":8080")
 }
