@@ -1,7 +1,9 @@
 package store
 
+import . "url-shortener/internal/types"
+
 type StoreBackEnd struct {
-	Memory *map[string]string
+	Memory *map[string]URLInfo
 }
 
 func (sbe *StoreBackEnd) IsExist(key string) bool {
@@ -12,10 +14,10 @@ func (sbe *StoreBackEnd) IsExist(key string) bool {
 	}
 }
 
-func (sbe *StoreBackEnd) Add(key string, val string) {
-	(*sbe.Memory)[key] = val
+func (sbe *StoreBackEnd) Add(key string, urlInfo URLInfo) {
+	(*sbe.Memory)[key] = urlInfo
 }
 
-func (sbe *StoreBackEnd) Get(key string) string {
+func (sbe *StoreBackEnd) Get(key string) URLInfo {
 	return (*sbe.Memory)[key]
 }

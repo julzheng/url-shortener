@@ -5,7 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+	"time"
 	"url-shortener/internal/store"
+	. "url-shortener/internal/types"
 	"url-shortener/internal/utils"
 )
 
@@ -13,7 +15,7 @@ func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("internal/templates/*")
 
-	memMap := make(map[string]string)
+	memMap := make(map[string]URLInfo)
 	memory := store.StoreBackEnd{&memMap}
 
 	router.POST("/shorten", func(c *gin.Context) {
@@ -24,7 +26,7 @@ func main() {
 		for ok := true; ok; ok = memory.IsExist(alphaNum) {
 			alphaNum = utils.RandSeq(3)
 		}
-		memory.Add(alphaNum, url)
+		memory.Add(alphaNum, URLInfo{url, 0, time.Now()})
 
 		c.JSON(http.StatusOK, gin.H{
 			"shortened_url": fmt.Sprintf("http://localhost:8080/%v", alphaNum),
@@ -35,7 +37,11 @@ func main() {
 
 		shortened_url := strings.Replace(c.Param("url"), "/", "", 1)
 		if memory.IsExist(shortened_url) {
-			c.Redirect(http.StatusFound, memory.Get(shortened_url))
+			urlInfo := memory.Get(shortened_url)
+			urlInfo.RedirectCount += 1
+			fmt.Printf("Redirect count: %v times, Created at: %v", urlInfo.RedirectCount, urlInfo.CreatedAt)
+
+			c.Redirect(http.StatusFound, urlInfo.URL)
 		} else {
 			c.HTML(http.StatusNotFound, "404.tmpl", gin.H{
 				"message": "404 not found",
