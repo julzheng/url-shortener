@@ -21,3 +21,7 @@ func (sbe *StoreBackEnd) Add(key string, urlInfo URLInfo) {
 func (sbe *StoreBackEnd) Get(key string) URLInfo {
 	return (*sbe.Memory)[key]
 }
+
+func (sbe *StoreBackEnd) Save(key string, info URLInfo) {
+	(*sbe.Memory)[key] = info
+}

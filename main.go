@@ -33,18 +33,31 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
-	router.GET("*url", func(c *gin.Context) {
+	router.GET(":url", func(c *gin.Context) {
 
 		shortened_url := strings.Replace(c.Param("url"), "/", "", 1)
 		if memory.IsExist(shortened_url) {
 			urlInfo := memory.Get(shortened_url)
 			urlInfo.RedirectCount += 1
+			memory.Save(shortened_url, urlInfo)
 			fmt.Printf("Redirect count: %v times, Created at: %v", urlInfo.RedirectCount, urlInfo.CreatedAt)
 
 			c.Redirect(http.StatusFound, urlInfo.URL)
 		} else {
 			c.HTML(http.StatusNotFound, "404.tmpl", gin.H{
 				"message": "404 not found",
+			})
+		}
+	})
+
+	router.GET(":url/stats", func(c *gin.Context) {
+		shortened_url := strings.Replace(c.Param("url"), "/", "", 1)
+		if memory.IsExist(shortened_url) {
+			urlInfo := memory.Get(shortened_url)
+
+			c.JSON(http.StatusOK, gin.H{
+				"created_at":     urlInfo.CreatedAt,
+				"redirect_count": urlInfo.RedirectCount,
 			})
 		}
 	})
